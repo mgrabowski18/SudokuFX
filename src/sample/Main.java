@@ -1,9 +1,6 @@
 package sample;
 
-import com.sun.javafx.binding.StringFormatter;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,22 +8,29 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import java.awt.event.KeyListener;
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 public class Main extends Application {
+
+    static TextField[][] tx = new TextField[9][9];
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Sudoku");
+        Sudoku sudo = new Sudoku();
+
 
 
         StackPane layout = new StackPane();
@@ -49,7 +53,7 @@ public class Main extends Application {
         int x_pane;
         int y_pane;
 
-        TextField[][] tx = new TextField[9][9];
+
         for(int i=0; i<=8; i++) {
             x_pane = i % 3;
             y_pane = i / 3;
@@ -71,12 +75,29 @@ public class Main extends Application {
                             return change ;
                         }
                     }));
+
                     tx[i][index].setOnKeyPressed(new EventHandler<KeyEvent>() {
                         @Override
                         public void handle(KeyEvent event) {
-                            StringBuffer buff = new StringBuffer();
-                            //buff.
-                            System.out.println(event.getSource());
+                            StringBuilder build = new StringBuilder().append(event.getSource());
+                            int index=build.lastIndexOf("id=");
+                            build=build.delete(0,index+3);
+                            index=build.indexOf(",");
+                            build=build.delete(index,build.length());
+
+
+                            String id = build.toString();
+                            String value = event.getText();
+                            int segment= Integer.parseInt(String.valueOf(id.charAt(0)));
+                            int pos = Integer.parseInt(String.valueOf(id.charAt(1)));
+
+                            Map<String, String> toReturn=new HashMap<>();
+
+                            if (value.matches("[1-9]")&&tx[segment][pos].getText().equals("")) {
+                                sudo.add(id,value);
+                                System.out.print(" "+id+"\n");
+
+                            }
                         }
                     });
 

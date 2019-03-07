@@ -1,7 +1,6 @@
 package sample;
 
 import javafx.scene.control.TextField;
-import java.awt.event.ActionEvent;
 
 public class Controller {
 
@@ -13,6 +12,8 @@ public class Controller {
 
         System.out.println(tx1.getText());
     }
+
+
 
 
 }
