@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class Main extends Application {
 
-    static TextField[][] tx = new TextField[9][9];
+    private static TextField[][] tx = new TextField[9][9];
 
 
     @Override

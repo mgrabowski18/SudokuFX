@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Sudoku {
     private int[][] SudokuArray;
-    Map<String, String> ArrayAddresses = new HashMap<>();
+    private Map<String, String> ArrayAddresses = new HashMap<>();
 
     public Sudoku()
     {
