@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Sudoku {
+public class Sudoku2 {
     private int[][] sudokuArray;
     private int[][] toSolve;
     private boolean[][] isModifiable;
@@ -20,8 +20,7 @@ public class Sudoku {
     private int tempcol;
 
 
-
-    public Sudoku() {
+    public Sudoku2() {
         this.sudokuArray = new int[9][9];
         this.toSolve = new int[9][9];
         this.isModifiable = new boolean[9][9];
@@ -117,9 +116,7 @@ public class Sudoku {
         }
         System.out.println(isArrayValid(sudokuArray));
 
-
         generateToSolve();
-
         System.out.println("----toSolve----");
         for (int i = 0; i < toSolve.length; i++) {
             for (int j = 0; j < toSolve[i].length; j++)
@@ -127,6 +124,8 @@ public class Sudoku {
             System.out.println("");
         }
         System.out.println(countNotEmptyFields(toSolve));
+
+
     }
 
     public void add(String position, String value) {
@@ -145,7 +144,6 @@ public class Sudoku {
         for (int i = 0; i < this.sudokuArray.length; i++) {
             for (int j = 0; j < this.sudokuArray.length; j++) {
                 this.sudokuArray[i][j] = 0;
-
             }
         }
     }
@@ -194,7 +192,6 @@ public class Sudoku {
     }
 
     private boolean notInCell(int k, int i, int j) {
-
         int i2 = i - (i % 3);
         int j2 = j - (j % 3);
         for (i = i2; i < i2 + 3; i++)
@@ -205,7 +202,6 @@ public class Sudoku {
     }
 
     private boolean notInCell(int[][] array, int row, int col, int value) {
-
         int i2 = row - (row % 3);
         int j2 = col - (col % 3);
         for (int i = i2; i < i2 + 3; i++)
@@ -237,7 +233,6 @@ public class Sudoku {
             for (int col = 0; col < array[row].length; col++) {
                 if (!notInCell(array, row, col, array[row][col]) || !notInRow(array, row, col, array[row][col]) || !notInColumn(array, row, col, array[row][col]))
                     return false;
-
             }
         }
         return true;
@@ -262,16 +257,12 @@ public class Sudoku {
             emergencyReset(sudokuArray);
             return;
         }
-
-
         int index = row * 9 + col;
         count[index]++;
-
         if (value == 0)
             value = (int) (Math.random() * 9) + 1;
         else
             value = valueGenerator(value);
-
         if (isValid(value, row, col)) {
             sudokuArray[row][col] = value;
             resetCount(index);
@@ -284,63 +275,25 @@ public class Sudoku {
                 row--;
             } else
                 return;
-
             resetCount(index);
             this.row = row;
             this.col = col;
             value = sudokuArray[row][col];
             generate(row, col, value);
-
         } else {
             generate(row, col, value);
         }
-
-
     }
 
-    /*private void generateToSolve() {
-        counter = 0;
-        resetCount();
-        for (int i = 0; i < 5; i++)
-            generateField();
-
-        while (!areTheSame(sudokuArray, toSolve)) {
-            emergencyReset(toSolve, isModifiable);
-            generateField();
-            solution();
-        }
-        emergencyReset(toSolve, isModifiable);
-    }*/
 
     private void generateToSolve() {
-        counter = 0;
-        resetCount();
-        toSolve = cloneTable(sudokuArray);
-        isModifiable = setBoolTable(isModifiable, true);
-
-        while(areTheSame(sudokuArray, toSolve))
+        int number = (int) (Math.random()*10+20);
+        for(int i=0; i<number; i++)
         {
-            emergencyReset(toSolve, isModifiable);
-            removeField();
-            solution();
+            generateField();
         }
-        toSolve[temprow][tempcol]=sudokuArray[temprow][tempcol];
-        isModifiable[tempcol][temprow]=true;
-        emergencyReset(toSolve, isModifiable);
 
-    }
 
-    private void removeField() {
-        int pos = getRandom(toSolve);
-        int row = pos / 9;
-        int col = pos % 9;
-        if (toSolve[row][col] != 0) {
-            toSolve[row][col] = 0;
-            isModifiable[row][col] = false;
-            temprow=row;
-            tempcol=col;
-        } else
-            removeField();
     }
 
     private void generateField() {
@@ -354,69 +307,6 @@ public class Sudoku {
             generateField();
     }
 
-    private boolean areTheSame(int[][] arrayRef, int[][] arrayNew) {
-        for (int i = 0; i < arrayRef.length; i++) {
-            for (int j = 0; j < arrayRef[i].length; j++) {
-                if (arrayRef[i][j] != arrayNew[i][j])
-                    return false;
-            }
-        }
-        return true;
-    }
-
-    private void solution() {
-        System.out.println(countNotEmptyFields(toSolve));
-        for (this.row = 0; row < toSolve.length; row++)
-            for (this.col = 0; col < toSolve[row].length; col++) {
-                if (toSolve[row][col] == 0) {
-                    int value = 0;
-                    if (toSolve[row][col] == value)
-                        solution(row, col, value);
-                }
-            }
-    }
-
-    private void solution(int row, int col, int value) {
-        ++counter;
-        if (counter > 1500 || count[0] > 10) {
-            emergencyReset(toSolve, isModifiable);
-            return;
-        } else if (isModifiable[row][col] == true)
-            return;
-
-        int index = row * 9 + col;
-        count[index]++;
-
-        if (value == 0)
-            value = (int) (Math.random() * 9) + 1;
-        else
-            value = valueGenerator(value);
-
-        if (isValid(toSolve, row, col, value)) {
-            toSolve[row][col] = value;
-            resetCount(index);
-        } else if (count[index] > 8) {
-            if (col > 0) {
-                col--;
-                // row = this.row;
-            } else if (col == 0 && row > 0) {
-                col = 8;
-                row--;
-            } else
-                return;
-
-            resetCount(index);
-            this.row = row;
-            this.col = col;
-            value = toSolve[row][col];
-            solution(row, col, value);
-
-        } else {
-            solution(row, col, value);
-        }
-
-    }
-
     private int getRandom(int[][] array) {
         int size = array.length * array[array.length - 1].length;
         return (int) (Math.random() * size);
@@ -426,7 +316,6 @@ public class Sudoku {
         value = value + 1;
         if (value > 9)
             value = 1;
-
         return value;
     }
 
@@ -434,7 +323,6 @@ public class Sudoku {
         for (int e = 0; e < this.count.length; e++) {
             count[e] = 0;
         }
-
     }
 
     private void resetCount(int i) {
@@ -443,15 +331,12 @@ public class Sudoku {
     }
 
     private boolean[][] setBoolTable(boolean[][] table, boolean state) {
-        for (int index =0 ; index < table.length; index++)
-        {
-            for(int index2=0; index2<table[index].length; index2++)
-            {
-                table[index][index2]=state;
+        for (int index = 0; index < table.length; index++) {
+            for (int index2 = 0; index2 < table[index].length; index2++) {
+                table[index][index2] = state;
             }
         }
         return table;
-
     }
 
     private void emergencyReset(int[][] array) {
@@ -463,21 +348,6 @@ public class Sudoku {
         array[row][col] = (int) (Math.random() * 9) + 1;
     }
 
-    private void emergencyReset(int[][] array, boolean[][] logic) {
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[i].length; j++) {
-                if (logic[i][j] == false)
-                    array[i][j] = 0;
-            }
-        }
-        resetCount();
-        this.col = 0;
-        this.row = 0;
-        this.counter = 0;
-        //if(!isModifiable[row][col])
-        // array[row][col] = (int) (Math.random() * 9) + 1;
-    }
-
     private int countNotEmptyFields(int[][] array) {
         int number = 0;
         for (int i = 0; i < array.length; i++) {
@@ -485,21 +355,7 @@ public class Sudoku {
                 if (array[i][j] != 0)
                     number++;
             }
-
         }
         return number;
     }
-
-    private int[][] cloneTable(int[][] ref) {
-        int[][] cloned = new int[ref.length][ref[ref.length - 1].length];
-        for (int i = 0; i < ref.length; i++) {
-            for (int j = 0; j < ref[i].length; j++) {
-                cloned[i][j] = ref[i][j];
-            }
-        }
-
-        return cloned;
-    }
-
-
 }

@@ -28,7 +28,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Sudoku");
-        Sudoku sudo = new Sudoku();
+        Sudoku2 sudo = new Sudoku2();
 
 
         StackPane layout = new StackPane();
