@@ -22,6 +22,8 @@ import java.util.Map;
 public class Main extends Application {
 
     private static TextField[][] tx = new TextField[9][9];
+    private static int[][] gridValues;
+    private static String[][] gridId;
 
 
     @Override
@@ -29,6 +31,7 @@ public class Main extends Application {
         //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Sudoku");
         Sudoku2 sudo = new Sudoku2();
+        gridValues = sudo.getGrid();
 
 
         StackPane layout = new StackPane();
@@ -64,6 +67,10 @@ public class Main extends Application {
                     tx[i][index].setFont(Font.font("Verdana", FontWeight.BOLD, 30));
                     tx[i][index].setId(Integer.toString(i) + index);
                     tx[i][index].setAlignment(Pos.CENTER);
+                    if (gridValues[i][index] != 0) {
+                        tx[i][index].setText(Integer.toString(gridValues[i][index]));
+                        tx[i][index].setDisable(true);
+                    }
                     tx[i][index].setTextFormatter(new TextFormatter<String>((TextFormatter.Change change) -> {
                         String newText = change.getControlNewText();
                         if (newText.length() > 1 || newText.matches("[^1-9]")) {
@@ -91,9 +98,28 @@ public class Main extends Application {
                             Map<String, String> toReturn = new HashMap<>();
 
                             if (value.matches("[1-9]") && tx[segment][pos].getText().equals("")) {
-                                sudo.add(id, value);
-
+                                if (!tx[segment][pos].isDisable()) {
+                                    sudo.add(id, value);
+                                    if (!sudo.isGridValid(segment, pos, Integer.parseInt(event.getText()))) {
+                                        tx[segment][pos].setStyle("-fx-background-color: #AB4642;");
+                                        //tx[segment][pos].setBackground();
+                                    }
+                                    else {
+                                        gridValues = sudo.getGrid();
+                                        tx[segment][pos].setStyle(null);
+                                        System.out.println("");
+                                        for (int i = 0; i < gridValues.length; i++) {
+                                            for (int j = 0; j < gridValues[i].length; j++)
+                                                System.out.print(gridValues[i][j] + " ");
+                                            System.out.println("");
+                                        }
+                                    }
+                                    //System.out.println(tx[segment][pos].getText());
+                                }
                             }
+                            else
+                                tx[segment][pos].setStyle(null);
+
                         }
                     });
 
@@ -111,8 +137,9 @@ public class Main extends Application {
         flow.setAlignment(Pos.CENTER);
         layout.getChildren().add(flow);
 
-
-        primaryStage.setScene(new Scene(layout, 600, 600));
+        Scene scene = new Scene(layout, 600, 600);
+        scene.getStylesheets().add("sample/style.css");
+        primaryStage.setScene(scene);
         primaryStage.show();
 
     }

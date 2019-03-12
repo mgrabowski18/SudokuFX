@@ -1,0 +1,11 @@
+.root {
+    -fx-background-color: #FFFFFF;
+}
+
+#WrongField{
+    -fx-background-color: #AB4642;
+}
+
+#CorrectField.text-field{
+    -fx-background-color: #FFFFFF;
+}

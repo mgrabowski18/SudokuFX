@@ -9,6 +9,7 @@ import java.util.Set;
 public class Sudoku2 {
     private int[][] sudokuArray;
     private int[][] toSolve;
+    private int[][] toReturn;
     private boolean[][] isModifiable;
     private Map<String, String> arrayAddresses = new HashMap<>();
     private Set<Integer> set = new HashSet<>();
@@ -23,6 +24,7 @@ public class Sudoku2 {
     public Sudoku2() {
         this.sudokuArray = new int[9][9];
         this.toSolve = new int[9][9];
+        this.toReturn = new int[9][9];
         this.isModifiable = new boolean[9][9];
         arrayAddresses.put("00", "00");
         arrayAddresses.put("01", "01");
@@ -132,11 +134,35 @@ public class Sudoku2 {
         int row = Integer.parseInt(String.valueOf(arrayAddresses.get(position).charAt(0)));
         int col = Integer.parseInt(String.valueOf(arrayAddresses.get(position).charAt(1)));
         int valueToPut = Integer.parseInt(value);
-        if (sudokuArray[row][col] != valueToPut) {
-            sudokuArray[row][col] = valueToPut;
-            System.out.print(row + "" + col + ": " + value);
+        if (toSolve[row][col] != valueToPut) {
+            toSolve[row][col] = valueToPut;
+            System.out.print(row + "" + col + ": " + value + " ");
         }
 
+    }
+
+    public int[][] getGrid() {
+        String toMap = "";
+        String toSearch = "";
+        int row;
+        int col;
+
+        for (int i = 0; i < toReturn.length; i++) {
+            for (int j = 0; j < toReturn[i].length; j++) {
+                toMap = i + "" + j;
+                toSearch = (String) getKeyFromValue(arrayAddresses, toMap);
+                row = Integer.parseInt(toSearch.substring(0, 1));
+                col = Integer.parseInt(toSearch.substring(1));
+                toReturn[row][col] = toSolve[i][j];
+            }
+        }
+        /*System.out.println();
+        for (int i = 0; i < toReturn.length; i++) {
+            for (int j = 0; j < toReturn[i].length; j++)
+                System.out.print(toReturn[i][j] + " ");
+            System.out.println("");
+        }*/
+        return toReturn;
     }
 
 
@@ -219,6 +245,16 @@ public class Sudoku2 {
             return false;
     }
 
+    public boolean isGridValid(int gridRow, int gridCol, int value) {
+        String toMap = gridRow + "" + gridCol;
+        String toSearch = arrayAddresses.get(toMap);
+        int row = Integer.parseInt(toSearch.substring(0, 1));
+        int col = Integer.parseInt(toSearch.substring(1));
+        if (isValid(toSolve, row, col, value))
+            return true;
+        return false;
+    }
+
     private boolean isValid(int[][] array, int row, int col, int value) {
 
         if (notInColumn(array, row, col, value) && notInRow(array, row, col, value) && notInCell(array, row, col, value)) {
@@ -287,9 +323,8 @@ public class Sudoku2 {
 
 
     private void generateToSolve() {
-        int number = (int) (Math.random()*10+20);
-        for(int i=0; i<number; i++)
-        {
+        int number = (int) (Math.random() * 10 + 20);
+        for (int i = 0; i < number; i++) {
             generateField();
         }
 
@@ -357,5 +392,14 @@ public class Sudoku2 {
             }
         }
         return number;
+    }
+
+    private Object getKeyFromValue(Map hm, Object value) {
+        for (Object o : hm.keySet()) {
+            if (hm.get(o).equals(value)) {
+                return o;
+            }
+        }
+        return null;
     }
 }
