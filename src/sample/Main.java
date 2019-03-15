@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyEvent;
@@ -37,8 +38,8 @@ public class Main extends Application {
 
 
         StackPane layout = new StackPane();
-        layout.setMinSize(600, 600);
-        layout.setMaxSize(600, 600);
+        layout.setMinSize(600, 700);
+        layout.setMaxSize(600, 700);
 
 
         FlowPane flow = new FlowPane();
@@ -49,6 +50,15 @@ public class Main extends Application {
         flow.setVgap(4);
         flow.setHgap(4);
         flow.setPrefWrapLength(600);
+
+        FlowPane flowButton = new FlowPane();
+        flowButton.setPadding(new Insets(5, 0, 5, 0));
+        flowButton.setPrefSize(600, 100);
+        flowButton.setMinSize(600, 100);
+        flowButton.setMaxSize(600, 100);
+        flowButton.setVgap(4);
+        flowButton.setHgap(4);
+        flowButton.setPrefWrapLength(600);
 
 
         GridPane[][] topPane = new GridPane[3][3];
@@ -147,11 +157,20 @@ public class Main extends Application {
             flow.getChildren().add(topPane[x_pane][y_pane]);
         }
 
+        Button newButton = new Button("New Grid");
+        Button solveButton = new Button("Solve Grid");
+        Button resetButton = new Button("Reset Grid");
+
+        flowButton.getChildren().addAll(newButton, solveButton, resetButton);
 
         flow.setAlignment(Pos.CENTER);
-        layout.getChildren().add(flow);
+        flowButton.setAlignment(Pos.CENTER);
+        layout.setAlignment(Pos.TOP_CENTER);
 
-        Scene scene = new Scene(layout, 600, 600);
+        layout.getChildren().addAll(flow, flowButton);
+
+
+        Scene scene = new Scene(layout, 600, 800);
         scene.getStylesheets().add("sample/style.css");
         primaryStage.setScene(scene);
         primaryStage.show();
