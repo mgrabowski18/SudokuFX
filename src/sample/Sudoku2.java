@@ -323,7 +323,7 @@ public class Sudoku2 {
 
 
     private void generateToSolve() {
-        int number = (int) (Math.random() * 10 + 20);
+        int number = (int) (Math.random() * 10 + 30);
         for (int i = 0; i < number; i++) {
             generateField();
         }
@@ -383,7 +383,7 @@ public class Sudoku2 {
         array[row][col] = (int) (Math.random() * 9) + 1;
     }
 
-    private int countNotEmptyFields(int[][] array) {
+    public int countNotEmptyFields(int[][] array) {
         int number = 0;
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[i].length; j++) {

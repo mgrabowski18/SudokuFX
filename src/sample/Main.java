@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyEvent;
@@ -15,15 +16,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class Main extends Application {
 
     private static TextField[][] tx = new TextField[9][9];
     private static int[][] gridValues;
     private static String[][] gridId;
+    private static String id = "";
+    private static int segment;
+    private static int pos;
+    private static boolean isCorrect;
 
 
     @Override
@@ -80,55 +82,67 @@ public class Main extends Application {
                         }
                     }));
 
-                    tx[i][index].setOnKeyPressed(new EventHandler<KeyEvent>() {
+                    tx[i][index].setOnKeyTyped(new EventHandler<KeyEvent>() {
                         @Override
                         public void handle(KeyEvent event) {
-                            StringBuilder build = new StringBuilder().append(event.getSource());
-                            int index = build.lastIndexOf("id=");
-                            build = build.delete(0, index + 3);
-                            index = build.indexOf(",");
-                            build = build.delete(index, build.length());
 
 
-                            String id = build.toString();
+                            id = changeId(event.getSource().toString());
                             String value = event.getText();
-                            int segment = Integer.parseInt(String.valueOf(id.charAt(0)));
-                            int pos = Integer.parseInt(String.valueOf(id.charAt(1)));
+                            segment = Integer.parseInt(String.valueOf(id.charAt(0)));
+                            pos = Integer.parseInt(String.valueOf(id.charAt(1)));
 
-                            Map<String, String> toReturn = new HashMap<>();
 
                             if (value.matches("[1-9]") && tx[segment][pos].getText().equals("")) {
                                 if (!tx[segment][pos].isDisable()) {
+
                                     sudo.add(id, value);
                                     if (!sudo.isGridValid(segment, pos, Integer.parseInt(event.getText()))) {
                                         tx[segment][pos].setStyle("-fx-background-color: #AB4642;");
                                         //tx[segment][pos].setBackground();
-                                    }
-                                    else {
+                                    } else {
                                         gridValues = sudo.getGrid();
                                         tx[segment][pos].setStyle(null);
                                         System.out.println("");
-                                        for (int i = 0; i < gridValues.length; i++) {
-                                            for (int j = 0; j < gridValues[i].length; j++)
-                                                System.out.print(gridValues[i][j] + " ");
-                                            System.out.println("");
-                                        }
+
                                     }
-                                    //System.out.println(tx[segment][pos].getText());
                                 }
                             }
-                            else
+                            if (tx[segment][pos].getText().equals("") && !value.matches("[1-9]")) {
                                 tx[segment][pos].setStyle(null);
+                                sudo.add(id, "0");
+                                gridValues = sudo.getGrid();
+                            }
 
+                            System.out.println("");
+                            for (int i = 0; i < gridValues.length; i++) {
+                                System.out.println("");
+                                for (int j = 0; j < gridValues[i].length; j++) {
+                                    id = changeId(tx[i][j].toString());
+                                    segment = Integer.parseInt(String.valueOf(id.charAt(0)));
+                                    pos = Integer.parseInt(String.valueOf(id.charAt(1)));
+                                    value = tx[i][j].getText();
+                                    //System.out.println("value: " + value);
+                                    //System.out.println("id:" + id + " " + "seg:" + segment + " " + "pos:" + pos);
+                                    if (!value.equals("") && !tx[i][j].isDisable()) {
+                                        if (sudo.isGridValid(segment, pos, Integer.parseInt(value))) {
+                                            tx[i][j].setStyle(null);
+                                            sudo.add(id, value);
+                                            gridValues = sudo.getGrid();
+                                        } else {
+                                            tx[segment][pos].setStyle("-fx-background-color: #AB4642;");
+                                            sudo.add(id, "0");
+                                            gridValues = sudo.getGrid();
+                                        }
+                                    }
+                                    System.out.print(gridValues[i][j] + " ");
+                                }
+                            }
+                            winEvent();
                         }
                     });
-
-
                     topPane[x_pane][y_pane].add(tx[i][index], k + i % 3 * 3, j + i / 3 * 3);
-
-
                 }
-
             }
             flow.getChildren().add(topPane[x_pane][y_pane]);
         }
@@ -147,5 +161,37 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private boolean isCorrect(int[][] array) {
+        for (int i = 0; i < array.length; i++)
+            for (int j = 0; j < array[i].length; j++)
+                if (array[i][j] == 0)
+                    return false;
+        return true;
+    }
+
+    private String changeId(String input) {
+        StringBuilder build = new StringBuilder().append(input);
+        build = build.delete(0, build.lastIndexOf("id=") + 3);
+        build = build.delete(build.indexOf(","), build.length());
+        return build.toString();
+    }
+
+    private void winEvent() {
+        if (isCorrect(gridValues)) {
+            System.out.println("Wygrana!");
+            Alert winWindow = new Alert(Alert.AlertType.INFORMATION);
+            winWindow.setTitle("YOU WIN!");
+            winWindow.setHeaderText("You solved sudoku!");
+            winWindow.show();
+            for (int i = 0; i < tx.length; i++) {
+                for (int j = 0; j < tx[i].length; j++) {
+                    tx[i][j].setDisable(true);
+                    tx[i][j].setStyle("-fx-border-color: #000000; -fx-background-color: #FFFFFF;");
+                }
+            }
+        }
+        return;
     }
 }
