@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
-
-<TitledPane fx:controller="sample.Controller" animated="false" collapsible="false" maxHeight="600.0" maxWidth="60.0" minHeight="600.0" minWidth="600.0" prefHeight="600.0" prefWidth="600.0" text="Sudoku" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<TitledPane animated="false" collapsible="false" maxHeight="705.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" prefHeight="705.0" prefWidth="600.0" text="Sudoku" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
   <content>
-    <AnchorPane maxHeight="600.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" prefHeight="600.0" prefWidth="600.0" visible="true">
+    <AnchorPane maxHeight="746.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" prefHeight="746.0" prefWidth="600.0" visible="true">
          <children>
             <GridPane alignment="TOP_LEFT" gridLinesVisible="true" layoutX="30.0" layoutY="30.0" maxHeight="540.0" minHeight="540.0" prefHeight="540.0" prefWidth="540.0">
                <children>
@@ -26,7 +21,7 @@
                       <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <TextField fx:id="11" onKeyTyped="#handleTextFieldAction" alignment="CENTER" maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" prefHeight="60.0" prefWidth="60.0">
+                        <TextField fx:id="11" alignment="CENTER" maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" onKeyTyped="#handleTextFieldAction" prefHeight="60.0" prefWidth="60.0">
                           <font>
                             <Font size="30" />
                           </font>
@@ -559,6 +554,9 @@
                   <RowConstraints />
                </rowConstraints>
             </GridPane>
+            <Button layoutX="105.0" layoutY="602.0" mnemonicParsing="false" text="Button" />
+            <Button layoutX="269.0" layoutY="602.0" mnemonicParsing="false" text="Button" />
+            <Button layoutX="431.0" layoutY="602.0" mnemonicParsing="false" text="Button" />
          </children></AnchorPane>
   </content>
 </TitledPane>

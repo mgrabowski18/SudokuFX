@@ -10,9 +10,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -22,22 +24,21 @@ public class Main extends Application {
 
     private static TextField[][] tx = new TextField[9][9];
     private static int[][] gridValues;
-    private static String[][] gridId;
     private static String id = "";
     private static int segment;
     private static int pos;
-    private static boolean isCorrect;
+
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Sudoku");
         Sudoku2 sudo = new Sudoku2();
         gridValues = sudo.getGrid();
 
 
-        StackPane layout = new StackPane();
+        BorderPane layout = new BorderPane();
         layout.setMinSize(600, 700);
         layout.setMaxSize(600, 700);
 
@@ -51,14 +52,13 @@ public class Main extends Application {
         flow.setHgap(4);
         flow.setPrefWrapLength(600);
 
-        FlowPane flowButton = new FlowPane();
-        flowButton.setPadding(new Insets(5, 0, 5, 0));
-        flowButton.setPrefSize(600, 100);
-        flowButton.setMinSize(600, 100);
-        flowButton.setMaxSize(600, 100);
-        flowButton.setVgap(4);
-        flowButton.setHgap(4);
-        flowButton.setPrefWrapLength(600);
+        HBox hButton = new HBox();
+        hButton.setPadding(new Insets(15, 12, 15, 12));
+        hButton.setSpacing(45);
+        hButton.setPrefSize(600, 100);
+        hButton.setMinSize(600, 100);
+        hButton.setMaxSize(600, 100);
+        hButton.setStyle("-fx-background-color: #555555;");
 
 
         GridPane[][] topPane = new GridPane[3][3];
@@ -92,7 +92,7 @@ public class Main extends Application {
                         }
                     }));
 
-                    tx[i][index].setOnKeyTyped(new EventHandler<KeyEvent>() {
+                    tx[i][index].setOnKeyPressed(new EventHandler<KeyEvent>() {
                         @Override
                         public void handle(KeyEvent event) {
 
@@ -159,21 +159,96 @@ public class Main extends Application {
 
         Button newButton = new Button("New Grid");
         Button solveButton = new Button("Solve Grid");
-        Button resetButton = new Button("Reset Grid");
+        Button resetButton = new Button("Clear Grid");
 
-        flowButton.getChildren().addAll(newButton, solveButton, resetButton);
+        newButton.setPrefSize(100, 20);
+        solveButton.setPrefSize(100, 20);
+        resetButton.setPrefSize(100, 20);
+
+        hButton.getChildren().addAll(newButton, solveButton, resetButton);
+
 
         flow.setAlignment(Pos.CENTER);
-        flowButton.setAlignment(Pos.CENTER);
-        layout.setAlignment(Pos.TOP_CENTER);
-
-        layout.getChildren().addAll(flow, flowButton);
+        hButton.setAlignment(Pos.CENTER);
 
 
-        Scene scene = new Scene(layout, 600, 800);
+        layout.setCenter(flow);
+        layout.setBottom(hButton);
+
+
+        Scene scene = new Scene(layout, 600, 700);
         scene.getStylesheets().add("sample/style.css");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        newButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                sudo.resetGrid();
+                for (int i = 0; i < tx.length; i++)
+                    for (int j = 0; j < tx[i].length; j++) {
+                        tx[i][j].setDisable(false);
+                        tx[i][j].setStyle(null);
+                        tx[i][j].setText("");
+                        gridValues[i][j] = 0;
+                    }
+
+                gridValues = sudo.getGrid();
+
+                for (int i = 0; i < gridValues.length; i++) {
+                    for (int j = 0; j <= 2; j++) {
+                        for (int k = 0; k <= 2; k++) {
+                            int index = (j + k) + 2 * j;
+                            if (gridValues[i][index] != 0) {
+                                tx[i][index].setText(Integer.toString(gridValues[i][index]));
+                                tx[i][index].setDisable(true);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        solveButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                gridValues=sudo.getSolvedGrid();
+                for (int i = 0; i < gridValues.length; i++) {
+                    for (int j = 0; j <= 2; j++) {
+                        for (int k = 0; k <= 2; k++) {
+                            int index = (j + k) + 2 * j;
+                            if (!tx[i][index].isDisable()) {
+                                tx[i][index].setText(String.valueOf(gridValues[i][index]));
+                                tx[i][index].setStyle(null);
+                                tx[i][index].setDisable(true);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        });
+
+        resetButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                gridValues=sudo.clearToSolve();
+                for (int i = 0; i < gridValues.length; i++) {
+                    for (int j = 0; j <= 2; j++) {
+                        for (int k = 0; k <= 2; k++) {
+                            int index = (j + k) + 2 * j;
+                            if (!tx[i][index].isDisable()) {
+                                tx[i][index].setText("");
+                            }
+                            tx[i][index].setStyle(null);
+                        }
+                    }
+                }
+                //gridValues=sudo.getGrid();
+
+            }
+        });
 
     }
 
@@ -206,6 +281,7 @@ public class Main extends Application {
             winWindow.show();
             for (int i = 0; i < tx.length; i++) {
                 for (int j = 0; j < tx[i].length; j++) {
+                    tx[i][j].setText(String.valueOf(gridValues[i][j]));
                     tx[i][j].setDisable(true);
                     tx[i][j].setStyle("-fx-border-color: #000000; -fx-background-color: #FFFFFF;");
                 }

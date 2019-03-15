@@ -9,3 +9,8 @@
 #CorrectField.text-field{
     -fx-background-color: #FFFFFF;
 }
+
+.button{
+    -fx-border-style: solid;
+    -fx-border-radius: 2px;
+}

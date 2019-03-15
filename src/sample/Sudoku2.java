@@ -10,6 +10,7 @@ public class Sudoku2 {
     private int[][] sudokuArray;
     private int[][] toSolve;
     private int[][] toReturn;
+    private int[][] backupArray;
     private boolean[][] isModifiable;
     private Map<String, String> arrayAddresses = new HashMap<>();
     private Set<Integer> set = new HashSet<>();
@@ -25,7 +26,9 @@ public class Sudoku2 {
         this.sudokuArray = new int[9][9];
         this.toSolve = new int[9][9];
         this.toReturn = new int[9][9];
+        this.backupArray = new int[9][9];
         this.isModifiable = new boolean[9][9];
+
         arrayAddresses.put("00", "00");
         arrayAddresses.put("01", "01");
         arrayAddresses.put("02", "02");
@@ -119,6 +122,7 @@ public class Sudoku2 {
         System.out.println(isArrayValid(sudokuArray));
 
         generateToSolve();
+        backupToSolve();
         System.out.println("----toSolve----");
         for (int i = 0; i < toSolve.length; i++) {
             for (int j = 0; j < toSolve[i].length; j++)
@@ -342,6 +346,13 @@ public class Sudoku2 {
             generateField();
     }
 
+    private void backupToSolve() {
+        for (int i = 0; i < backupArray.length; i++) {
+            for (int j = 0; j < backupArray[i].length; j++)
+                backupArray[i][j] = toSolve[i][j];
+        }
+    }
+
     private int getRandom(int[][] array) {
         int size = array.length * array[array.length - 1].length;
         return (int) (Math.random() * size);
@@ -394,6 +405,47 @@ public class Sudoku2 {
         return number;
     }
 
+    public void resetGrid() {
+        this.sudokuArray = new int[9][9];
+        this.toSolve = new int[9][9];
+        this.toReturn = new int[9][9];
+        this.backupArray = new int[9][9];
+        this.isModifiable = new boolean[9][9];
+        initGrid();
+        generate();
+        System.out.println("----Generated----");
+        for (int i = 0; i < sudokuArray.length; i++) {
+            for (int j = 0; j < sudokuArray[i].length; j++)
+                System.out.print(sudokuArray[i][j] + " ");
+            System.out.println("");
+        }
+        System.out.println(isArrayValid(sudokuArray));
+        generateToSolve();
+        backupToSolve();
+        System.out.println("----toSolve----");
+        for (int i = 0; i < toSolve.length; i++) {
+            for (int j = 0; j < toSolve[i].length; j++)
+                System.out.print(toSolve[i][j] + " ");
+            System.out.println("");
+        }
+        System.out.println(countNotEmptyFields(toSolve));
+
+    }
+
+    public int[][] getSolvedGrid() {
+        return sudokuArray;
+    }
+
+    public int[][] clearToSolve() {
+        for (int i = 0; i < toSolve.length; i++) {
+            for (int j = 0; j < toSolve[i].length; j++) {
+                toSolve[i][j] = backupArray[i][j];
+            }
+        }
+        return toSolve;
+
+    }
+
     private Object getKeyFromValue(Map hm, Object value) {
         for (Object o : hm.keySet()) {
             if (hm.get(o).equals(value)) {
@@ -402,4 +454,6 @@ public class Sudoku2 {
         }
         return null;
     }
+
+
 }
