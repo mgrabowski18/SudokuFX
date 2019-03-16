@@ -1,10 +1,7 @@
 package sample;
 
-
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Sudoku2 {
     private int[][] sudokuArray;
@@ -13,13 +10,10 @@ public class Sudoku2 {
     private int[][] backupArray;
     private boolean[][] isModifiable;
     private Map<String, String> arrayAddresses = new HashMap<>();
-    private Set<Integer> set = new HashSet<>();
     private int count[] = new int[81];
     private int row;
     private int col;
     private int counter;
-    private int temprow;
-    private int tempcol;
 
 
     public Sudoku2() {
@@ -113,25 +107,7 @@ public class Sudoku2 {
 
         initGrid();
         generate();
-        System.out.println("----Generated----");
-        for (int i = 0; i < sudokuArray.length; i++) {
-            for (int j = 0; j < sudokuArray[i].length; j++)
-                System.out.print(sudokuArray[i][j] + " ");
-            System.out.println("");
-        }
-        System.out.println(isArrayValid(sudokuArray));
-
         generateToSolve();
-        backupToSolve();
-        System.out.println("----toSolve----");
-        for (int i = 0; i < toSolve.length; i++) {
-            for (int j = 0; j < toSolve[i].length; j++)
-                System.out.print(toSolve[i][j] + " ");
-            System.out.println("");
-        }
-        System.out.println(countNotEmptyFields(toSolve));
-
-
     }
 
     public void add(String position, String value) {
@@ -140,7 +116,6 @@ public class Sudoku2 {
         int valueToPut = Integer.parseInt(value);
         if (toSolve[row][col] != valueToPut) {
             toSolve[row][col] = valueToPut;
-            System.out.print(row + "" + col + ": " + value + " ");
         }
 
     }
@@ -160,15 +135,8 @@ public class Sudoku2 {
                 toReturn[row][col] = toSolve[i][j];
             }
         }
-        /*System.out.println();
-        for (int i = 0; i < toReturn.length; i++) {
-            for (int j = 0; j < toReturn[i].length; j++)
-                System.out.print(toReturn[i][j] + " ");
-            System.out.println("");
-        }*/
         return toReturn;
     }
-
 
     private void initGrid() {
         for (int i = 0; i < this.sudokuArray.length; i++) {
@@ -189,14 +157,6 @@ public class Sudoku2 {
         }
     }
 
-    private boolean notInColumn(int k, int j) {
-        for (int i = 0; i < this.sudokuArray.length; i++) {
-            if (this.sudokuArray[i][j] == k)
-                return false;
-        }
-        return true;
-    }
-
     private boolean notInColumn(int[][] array, int row, int col, int value) {
         for (int i = 0; i < array.length; i++) {
             if (array[i][col] == value && i != row)
@@ -205,29 +165,12 @@ public class Sudoku2 {
         return true;
     }
 
-    private boolean notInRow(int k, int i) {
-        for (int j = 0; j < this.sudokuArray.length; j++) {
-            if (this.sudokuArray[i][j] == k)
-                return false;
-        }
-        return true;
-    }
 
     private boolean notInRow(int[][] array, int row, int col, int value) {
         for (int j = 0; j < array.length; j++) {
             if (array[row][j] == value && j != col)
                 return false;
         }
-        return true;
-    }
-
-    private boolean notInCell(int k, int i, int j) {
-        int i2 = i - (i % 3);
-        int j2 = j - (j % 3);
-        for (i = i2; i < i2 + 3; i++)
-            for (j = j2; j < j2 + 3; j++)
-                if (this.sudokuArray[i][j] == k)
-                    return false;
         return true;
     }
 
@@ -241,14 +184,6 @@ public class Sudoku2 {
         return true;
     }
 
-    private boolean isValid(int value, int row, int col) {
-
-        if (notInColumn(value, col) && notInRow(value, row) && notInCell(value, row, col)) {
-            return true;
-        } else
-            return false;
-    }
-
     public boolean isGridValid(int gridRow, int gridCol, int value) {
         String toMap = gridRow + "" + gridCol;
         String toSearch = arrayAddresses.get(toMap);
@@ -260,24 +195,11 @@ public class Sudoku2 {
     }
 
     private boolean isValid(int[][] array, int row, int col, int value) {
-
         if (notInColumn(array, row, col, value) && notInRow(array, row, col, value) && notInCell(array, row, col, value)) {
             return true;
         } else
             return false;
     }
-
-    private boolean isArrayValid(int[][] array) {
-
-        for (int row = 0; row < array.length; row++) {
-            for (int col = 0; col < array[row].length; col++) {
-                if (!notInCell(array, row, col, array[row][col]) || !notInRow(array, row, col, array[row][col]) || !notInColumn(array, row, col, array[row][col]))
-                    return false;
-            }
-        }
-        return true;
-    }
-
 
     private void generate() {
         for (this.row = 0; row < sudokuArray.length; row++)
@@ -303,7 +225,7 @@ public class Sudoku2 {
             value = (int) (Math.random() * 9) + 1;
         else
             value = valueGenerator(value);
-        if (isValid(value, row, col)) {
+        if (isValid(sudokuArray, row, col, value)) {
             sudokuArray[row][col] = value;
             resetCount(index);
         } else if (count[index] > 8) {
@@ -325,14 +247,11 @@ public class Sudoku2 {
         }
     }
 
-
     private void generateToSolve() {
         int number = (int) (Math.random() * 10 + 30);
         for (int i = 0; i < number; i++) {
             generateField();
         }
-
-
     }
 
     private void generateField() {
@@ -341,16 +260,10 @@ public class Sudoku2 {
         int col = pos % 9;
         if (toSolve[row][col] == 0) {
             toSolve[row][col] = sudokuArray[row][col];
+            backupArray[row][col]=toSolve[row][col];
             isModifiable[row][col] = true;
         } else
             generateField();
-    }
-
-    private void backupToSolve() {
-        for (int i = 0; i < backupArray.length; i++) {
-            for (int j = 0; j < backupArray[i].length; j++)
-                backupArray[i][j] = toSolve[i][j];
-        }
     }
 
     private int getRandom(int[][] array) {
@@ -365,44 +278,18 @@ public class Sudoku2 {
         return value;
     }
 
-    private void resetCount() {
-        for (int e = 0; e < this.count.length; e++) {
-            count[e] = 0;
-        }
-    }
-
     private void resetCount(int i) {
         for (int index = i + 1; index < this.count.length; index++)
             this.count[index] = 0;
     }
 
-    private boolean[][] setBoolTable(boolean[][] table, boolean state) {
-        for (int index = 0; index < table.length; index++) {
-            for (int index2 = 0; index2 < table[index].length; index2++) {
-                table[index][index2] = state;
-            }
-        }
-        return table;
-    }
-
     private void emergencyReset(int[][] array) {
         resetGrid(array);
-        resetCount();
+        resetCount(-1);
         this.col = 0;
         this.row = 0;
         this.counter = 0;
         array[row][col] = (int) (Math.random() * 9) + 1;
-    }
-
-    public int countNotEmptyFields(int[][] array) {
-        int number = 0;
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[i].length; j++) {
-                if (array[i][j] != 0)
-                    number++;
-            }
-        }
-        return number;
     }
 
     public void resetGrid() {
@@ -413,23 +300,7 @@ public class Sudoku2 {
         this.isModifiable = new boolean[9][9];
         initGrid();
         generate();
-        System.out.println("----Generated----");
-        for (int i = 0; i < sudokuArray.length; i++) {
-            for (int j = 0; j < sudokuArray[i].length; j++)
-                System.out.print(sudokuArray[i][j] + " ");
-            System.out.println("");
-        }
-        System.out.println(isArrayValid(sudokuArray));
         generateToSolve();
-        backupToSolve();
-        System.out.println("----toSolve----");
-        for (int i = 0; i < toSolve.length; i++) {
-            for (int j = 0; j < toSolve[i].length; j++)
-                System.out.print(toSolve[i][j] + " ");
-            System.out.println("");
-        }
-        System.out.println(countNotEmptyFields(toSolve));
-
     }
 
     public int[][] getSolvedGrid() {
@@ -443,7 +314,6 @@ public class Sudoku2 {
             }
         }
         return toSolve;
-
     }
 
     private Object getKeyFromValue(Map hm, Object value) {
@@ -454,6 +324,4 @@ public class Sudoku2 {
         }
         return null;
     }
-
-
 }

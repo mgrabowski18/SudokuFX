@@ -113,8 +113,6 @@ public class Main extends Application {
                                     } else {
                                         gridValues = sudo.getGrid();
                                         tx[segment][pos].setStyle(null);
-                                        System.out.println("");
-
                                     }
                                 }
                             }
@@ -123,17 +121,12 @@ public class Main extends Application {
                                 sudo.add(id, "0");
                                 gridValues = sudo.getGrid();
                             }
-
-                            System.out.println("");
                             for (int i = 0; i < gridValues.length; i++) {
-                                System.out.println("");
                                 for (int j = 0; j < gridValues[i].length; j++) {
                                     id = changeId(tx[i][j].toString());
                                     segment = Integer.parseInt(String.valueOf(id.charAt(0)));
                                     pos = Integer.parseInt(String.valueOf(id.charAt(1)));
                                     value = tx[i][j].getText();
-                                    //System.out.println("value: " + value);
-                                    //System.out.println("id:" + id + " " + "seg:" + segment + " " + "pos:" + pos);
                                     if (!value.equals("") && !tx[i][j].isDisable()) {
                                         if (sudo.isGridValid(segment, pos, Integer.parseInt(value))) {
                                             tx[i][j].setStyle(null);
@@ -145,7 +138,6 @@ public class Main extends Application {
                                             gridValues = sudo.getGrid();
                                         }
                                     }
-                                    System.out.print(gridValues[i][j] + " ");
                                 }
                             }
                             winEvent();
@@ -274,7 +266,6 @@ public class Main extends Application {
 
     private void winEvent() {
         if (isCorrect(gridValues)) {
-            System.out.println("Wygrana!");
             Alert winWindow = new Alert(Alert.AlertType.INFORMATION);
             winWindow.setTitle("YOU WIN!");
             winWindow.setHeaderText("You solved sudoku!");

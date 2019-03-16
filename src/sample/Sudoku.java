@@ -1,17 +1,15 @@
 package sample;
 
-
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Sudoku {
     private int[][] sudokuArray;
     private int[][] toSolve;
+    private int[][] toReturn;
+    private int[][] backupArray;
     private boolean[][] isModifiable;
     private Map<String, String> arrayAddresses = new HashMap<>();
-    private Set<Integer> set = new HashSet<>();
     private int count[] = new int[81];
     private int row;
     private int col;
@@ -24,7 +22,11 @@ public class Sudoku {
     public Sudoku() {
         this.sudokuArray = new int[9][9];
         this.toSolve = new int[9][9];
+        this.toReturn = new int[9][9];
+        this.backupArray = new int[9][9];
         this.isModifiable = new boolean[9][9];
+
+
         arrayAddresses.put("00", "00");
         arrayAddresses.put("01", "01");
         arrayAddresses.put("02", "02");
@@ -109,35 +111,35 @@ public class Sudoku {
 
         initGrid();
         generate();
-        System.out.println("----Generated----");
-        for (int i = 0; i < sudokuArray.length; i++) {
-            for (int j = 0; j < sudokuArray[i].length; j++)
-                System.out.print(sudokuArray[i][j] + " ");
-            System.out.println("");
-        }
-        System.out.println(isArrayValid(sudokuArray));
-
-
         generateToSolve();
-
-        System.out.println("----toSolve----");
-        for (int i = 0; i < toSolve.length; i++) {
-            for (int j = 0; j < toSolve[i].length; j++)
-                System.out.print(toSolve[i][j] + " ");
-            System.out.println("");
-        }
-        System.out.println(countNotEmptyFields(toSolve));
     }
 
     public void add(String position, String value) {
         int row = Integer.parseInt(String.valueOf(arrayAddresses.get(position).charAt(0)));
         int col = Integer.parseInt(String.valueOf(arrayAddresses.get(position).charAt(1)));
         int valueToPut = Integer.parseInt(value);
-        if (sudokuArray[row][col] != valueToPut) {
-            sudokuArray[row][col] = valueToPut;
-            System.out.print(row + "" + col + ": " + value);
+        if (toSolve[row][col] != valueToPut) {
+            toSolve[row][col] = valueToPut;
         }
 
+    }
+
+    public int[][] getGrid() {
+        String toMap = "";
+        String toSearch = "";
+        int row;
+        int col;
+
+        for (int i = 0; i < toReturn.length; i++) {
+            for (int j = 0; j < toReturn[i].length; j++) {
+                toMap = i + "" + j;
+                toSearch = (String) getKeyFromValue(arrayAddresses, toMap);
+                row = Integer.parseInt(toSearch.substring(0, 1));
+                col = Integer.parseInt(toSearch.substring(1));
+                toReturn[row][col] = toSolve[i][j];
+            }
+        }
+        return toReturn;
     }
 
 
@@ -156,30 +158,13 @@ public class Sudoku {
                 for (int j = 0; j < array.length; j++) {
                     array[i][j] = 0;
                 }
-
             }
         }
-    }
-
-    private boolean notInColumn(int k, int j) {
-        for (int i = 0; i < this.sudokuArray.length; i++) {
-            if (this.sudokuArray[i][j] == k)
-                return false;
-        }
-        return true;
     }
 
     private boolean notInColumn(int[][] array, int row, int col, int value) {
         for (int i = 0; i < array.length; i++) {
             if (array[i][col] == value && i != row)
-                return false;
-        }
-        return true;
-    }
-
-    private boolean notInRow(int k, int i) {
-        for (int j = 0; j < this.sudokuArray.length; j++) {
-            if (this.sudokuArray[i][j] == k)
                 return false;
         }
         return true;
@@ -193,19 +178,7 @@ public class Sudoku {
         return true;
     }
 
-    private boolean notInCell(int k, int i, int j) {
-
-        int i2 = i - (i % 3);
-        int j2 = j - (j % 3);
-        for (i = i2; i < i2 + 3; i++)
-            for (j = j2; j < j2 + 3; j++)
-                if (this.sudokuArray[i][j] == k)
-                    return false;
-        return true;
-    }
-
     private boolean notInCell(int[][] array, int row, int col, int value) {
-
         int i2 = row - (row % 3);
         int j2 = col - (col % 3);
         for (int i = i2; i < i2 + 3; i++)
@@ -215,34 +188,22 @@ public class Sudoku {
         return true;
     }
 
-    private boolean isValid(int value, int row, int col) {
-
-        if (notInColumn(value, col) && notInRow(value, row) && notInCell(value, row, col)) {
+    public boolean isGridValid(int gridRow, int gridCol, int value) {
+        String toMap = gridRow + "" + gridCol;
+        String toSearch = arrayAddresses.get(toMap);
+        int row = Integer.parseInt(toSearch.substring(0, 1));
+        int col = Integer.parseInt(toSearch.substring(1));
+        if (isValid(toSolve, row, col, value))
             return true;
-        } else
-            return false;
+        return false;
     }
 
     private boolean isValid(int[][] array, int row, int col, int value) {
-
         if (notInColumn(array, row, col, value) && notInRow(array, row, col, value) && notInCell(array, row, col, value)) {
             return true;
         } else
             return false;
     }
-
-    private boolean isArrayValid(int[][] array) {
-
-        for (int row = 0; row < array.length; row++) {
-            for (int col = 0; col < array[row].length; col++) {
-                if (!notInCell(array, row, col, array[row][col]) || !notInRow(array, row, col, array[row][col]) || !notInColumn(array, row, col, array[row][col]))
-                    return false;
-
-            }
-        }
-        return true;
-    }
-
 
     private void generate() {
         for (this.row = 0; row < sudokuArray.length; row++)
@@ -263,7 +224,6 @@ public class Sudoku {
             return;
         }
 
-
         int index = row * 9 + col;
         count[index]++;
 
@@ -272,7 +232,7 @@ public class Sudoku {
         else
             value = valueGenerator(value);
 
-        if (isValid(value, row, col)) {
+        if (isValid(sudokuArray, row, col, value)) {
             sudokuArray[row][col] = value;
             resetCount(index);
         } else if (count[index] > 8) {
@@ -298,19 +258,6 @@ public class Sudoku {
 
     }
 
-    /*private void generateToSolve() {
-        counter = 0;
-        resetCount();
-        for (int i = 0; i < 5; i++)
-            generateField();
-
-        while (!areTheSame(sudokuArray, toSolve)) {
-            emergencyReset(toSolve, isModifiable);
-            generateField();
-            solution();
-        }
-        emergencyReset(toSolve, isModifiable);
-    }*/
 
     private void generateToSolve() {
         counter = 0;
@@ -365,7 +312,6 @@ public class Sudoku {
     }
 
     private void solution() {
-        System.out.println(countNotEmptyFields(toSolve));
         for (this.row = 0; row < toSolve.length; row++)
             for (this.col = 0; col < toSolve[row].length; col++) {
                 if (toSolve[row][col] == 0) {
@@ -474,8 +420,6 @@ public class Sudoku {
         this.col = 0;
         this.row = 0;
         this.counter = 0;
-        //if(!isModifiable[row][col])
-        // array[row][col] = (int) (Math.random() * 9) + 1;
     }
 
     private int countNotEmptyFields(int[][] array) {
@@ -501,5 +445,39 @@ public class Sudoku {
         return cloned;
     }
 
+
+    public void resetGrid() {
+        this.sudokuArray = new int[9][9];
+        this.toSolve = new int[9][9];
+        this.toReturn = new int[9][9];
+        this.backupArray = new int[9][9];
+        this.isModifiable = new boolean[9][9];
+        initGrid();
+        generate();
+        generateToSolve();
+    }
+
+    public int[][] getSolvedGrid() {
+        return sudokuArray;
+    }
+
+    public int[][] clearToSolve() {
+        for (int i = 0; i < toSolve.length; i++) {
+            for (int j = 0; j < toSolve[i].length; j++) {
+                toSolve[i][j] = backupArray[i][j];
+            }
+        }
+        return toSolve;
+    }
+
+
+    private Object getKeyFromValue(Map hm, Object value) {
+        for (Object o : hm.keySet()) {
+            if (hm.get(o).equals(value)) {
+                return o;
+            }
+        }
+        return null;
+    }
 
 }
